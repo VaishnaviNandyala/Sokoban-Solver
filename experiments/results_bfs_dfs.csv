@@ -1,0 +1,65 @@
+level,method,mode,solved,reason,states_explored,states_generated,time,length,pushes
+easy_01,bfs,step,True,solved,1,2,0.0001,1,1
+easy_01,dfs,step,True,solved,65,65,0.0009,1,1
+easy_01,bfs,push,True,solved,1,3,0.0004,1,1
+easy_01,dfs,push,True,solved,8,8,0.0011,1,1
+easy_02,bfs,step,True,solved,5,13,0.0002,2,2
+easy_02,dfs,step,True,solved,3,3,0.0001,2,2
+easy_02,bfs,push,True,solved,5,11,0.0022,2,2
+easy_02,dfs,push,True,solved,3,3,0.0012,2,2
+easy_03,bfs,step,True,solved,702,1079,0.0108,10,6
+easy_03,dfs,step,True,solved,1959,1959,0.0319,282,40
+easy_03,bfs,push,True,solved,30,85,0.0163,12,4
+easy_03,dfs,push,True,solved,100,100,0.0395,43,14
+hard_01,bfs,step,True,solved,198120,207130,1.5897,26,12
+hard_01,dfs,step,True,solved,157359,157359,1.1188,3192,360
+hard_01,bfs,push,True,solved,6409,6766,3.4537,32,12
+hard_01,dfs,push,True,solved,2046,2046,1.0548,156,46
+hard_02,bfs,step,False,timeout,2967552,3626803,30.0017,0,0
+hard_02,dfs,step,False,timeout,3098624,3098624,30.0016,0,0
+hard_02,bfs,push,False,timeout,27904,47428,30.0977,0,0
+hard_02,dfs,push,False,timeout,36096,36096,30.1881,0,0
+hard_03,bfs,step,False,timeout,3356672,4039532,30.0012,0,0
+hard_03,dfs,step,False,timeout,3266048,3266048,30.0008,0,0
+hard_03,bfs,push,False,timeout,29440,47442,30.2135,0,0
+hard_03,dfs,push,False,timeout,39680,39680,30.0533,0,0
+hard_04,bfs,step,False,timeout,2899456,3732020,30.5505,0,0
+hard_04,dfs,step,False,timeout,2796288,2796288,30.0391,0,0
+hard_04,bfs,push,False,timeout,30208,60573,30.061,0,0
+hard_04,dfs,push,False,timeout,45312,45312,30.1089,0,0
+hard_05,bfs,step,True,solved,297713,350592,2.352,28,8
+hard_05,dfs,step,True,solved,17984,17984,0.1127,182,50
+hard_05,bfs,push,True,solved,8808,12634,3.3331,30,8
+hard_05,dfs,push,True,solved,10467,10467,2.6188,300,98
+medium_01,bfs,step,True,solved,1363,1984,0.0077,12,5
+medium_01,dfs,step,True,solved,5441,5441,0.0393,391,57
+medium_01,bfs,push,True,solved,106,175,0.0377,13,5
+medium_01,dfs,push,True,solved,218,218,0.066,69,21
+medium_02,bfs,step,True,solved,17925,23640,0.1186,15,5
+medium_02,dfs,step,True,solved,42985,42985,0.2761,1334,181
+medium_02,bfs,push,True,solved,392,863,0.1869,21,5
+medium_02,dfs,push,True,solved,1634,1634,0.5336,349,81
+medium_03,bfs,step,True,solved,792,1052,0.0068,14,3
+medium_03,dfs,step,True,solved,931,931,0.0068,216,35
+medium_03,bfs,push,True,solved,9,30,0.0036,14,3
+medium_03,dfs,push,True,solved,71,71,0.0129,54,19
+medium_04,bfs,step,True,solved,229,379,0.0019,9,4
+medium_04,dfs,step,True,solved,9218,9218,0.0542,12,4
+medium_04,bfs,push,True,solved,62,149,0.0306,10,4
+medium_04,dfs,push,True,solved,309,309,0.1087,35,10
+medium_05,bfs,step,True,solved,547,727,0.0032,10,5
+medium_05,dfs,step,True,solved,50,50,0.0007,43,5
+medium_05,bfs,push,True,solved,67,119,0.0303,16,5
+medium_05,dfs,push,True,solved,184,184,0.0435,84,17
+trivial_01,bfs,step,True,solved,1,2,0.0,1,1
+trivial_01,dfs,step,True,solved,2,2,0.0,1,1
+trivial_01,bfs,push,True,solved,1,2,0.0001,1,1
+trivial_01,dfs,push,True,solved,2,2,0.0001,1,1
+unsolvable_01,bfs,step,False,no solution,5,5,0.0,0,0
+unsolvable_01,dfs,step,False,no solution,5,5,0.0001,0,0
+unsolvable_01,bfs,push,False,no solution,1,1,0.0,0,0
+unsolvable_01,dfs,push,False,no solution,1,1,0.0001,0,0
+unsolvable_02,bfs,step,False,no solution,70,70,0.0004,0,0
+unsolvable_02,dfs,step,False,no solution,70,70,0.0004,0,0
+unsolvable_02,bfs,push,False,no solution,5,5,0.0004,0,0
+unsolvable_02,dfs,push,False,no solution,5,5,0.0004,0,0
