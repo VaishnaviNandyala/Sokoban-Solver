@@ -11,7 +11,7 @@ Usage:
     from src.level_parser import load_level
     from src.bfs_dfs import bfs, dfs
 
-    level = load_level("levels/easy_01.txt")
+    level = load_level("levels/Level-1.txt")
     result = bfs(level)
     print(result["solution"])        # e.g. "dDD"  (None if unsolved)
     print(result["states_explored"], result["time"], result["length"])

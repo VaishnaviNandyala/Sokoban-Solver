@@ -1,7 +1,7 @@
 """Small CLI for Member 1's engine.
 
-    python -m src.main --level levels/easy_01.txt
-    python -m src.main --level levels/easy_01.txt --replay D
+    python -m src.main --level levels/Level-1.txt
+    python -m src.main --level levels/Level-1.txt --replay D
 """
 import argparse
 

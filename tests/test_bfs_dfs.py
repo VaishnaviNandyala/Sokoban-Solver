@@ -24,8 +24,8 @@ def replay(level, solution):
     return state
 
 
-SOLVABLE = ["trivial_01.txt", "easy_01.txt", "easy_02.txt", "easy_03.txt",
-            "medium_03.txt"]
+SOLVABLE = ["Level-14.txt", "Level-1.txt", "Level-2.txt", "Level-3.txt",
+            "Level-6.txt"]
 
 
 @pytest.mark.parametrize("name", SOLVABLE)
@@ -40,7 +40,7 @@ def test_solution_replays_to_goal(name, method, mode):
     assert res["length"] == len(res["solution"])
 
 
-@pytest.mark.parametrize("name", ["unsolvable_01.txt", "unsolvable_02.txt"])
+@pytest.mark.parametrize("name", ["Level-15.txt", "Level-16.txt"])
 @pytest.mark.parametrize("method", ["bfs", "dfs"])
 @pytest.mark.parametrize("mode", ["step", "push"])
 def test_unsolvable_returns_none(name, method, mode):
@@ -51,13 +51,13 @@ def test_unsolvable_returns_none(name, method, mode):
 
 
 def test_bfs_is_shortest_in_steps():
-    level = lv("easy_01.txt")
+    level = lv("Level-1.txt")
     b, d = bfs(level), dfs(level)
     assert b["length"] <= d["length"]
 
 
 def test_bfs_trivial_level_is_one_push():
-    res = bfs(lv("trivial_01.txt"))
+    res = bfs(lv("Level-14.txt"))
     assert res["solution"] == "R"
     assert res["pushes"] == 1
 
@@ -69,17 +69,17 @@ def test_already_solved_level():
 
 
 def test_state_limit_stops_search():
-    res = bfs(lv("hard_01.txt"), max_states=50)
+    res = bfs(lv("Level-9.txt"), max_states=50)
     assert not res["solved"] and res["reason"] == "state limit"
 
 
 def test_time_limit_stops_search():
-    res = dfs(lv("hard_02.txt"), time_limit=0.0)
+    res = dfs(lv("Level-10.txt"), time_limit=0.0)
     assert not res["solved"] and res["reason"] == "timeout"
 
 
 def test_bad_arguments():
     with pytest.raises(ValueError):
-        solve(lv("easy_01.txt"), "astar")
+        solve(lv("Level-1.txt"), "astar")
     with pytest.raises(ValueError):
-        solve(lv("easy_01.txt"), "bfs", mode="jump")
+        solve(lv("Level-1.txt"), "bfs", mode="jump")

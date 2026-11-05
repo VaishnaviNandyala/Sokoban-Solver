@@ -2,7 +2,7 @@
 
     python -m experiments.run_bfs_dfs
     python -m experiments.run_bfs_dfs --time-limit 30 --mode push
-    python -m experiments.run_bfs_dfs --levels levels/easy_01.txt levels/medium_01.txt
+    python -m experiments.run_bfs_dfs --levels levels/Level-1.txt levels/Level-4.txt
 
 Writes experiments/results_bfs_dfs.csv (for Member 4's report / graphs).
 """
