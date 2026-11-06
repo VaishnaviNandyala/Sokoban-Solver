@@ -24,7 +24,7 @@ def replay(level, solution):
     return state
 
 
-SOLVABLE = ["Level-14.txt", "Level-01.txt", "Level-2.txt", "Level-03.txt",
+SOLVABLE = ["Level-14.txt", "Level-01.txt", "Level-02.txt", "Level-03.txt",
             "Level-06.txt"]
 
 

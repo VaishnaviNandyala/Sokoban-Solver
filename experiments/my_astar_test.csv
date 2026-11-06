@@ -1,0 +1,65 @@
+level,method,mode,solved,reason,states_explored,states_generated,time,length,pushes
+Level-01,astar,step,True,solved,2,4,0.0001,1,1
+Level-01,astar-matching,step,True,solved,2,4,0.0001,1,1
+Level-01,astar,push,True,solved,2,5,0.0002,1,1
+Level-01,astar-matching,push,True,solved,2,5,0.0002,1,1
+Level-02,astar,step,True,solved,3,9,0.0001,2,2
+Level-02,astar-matching,step,True,solved,3,9,0.0002,2,2
+Level-02,astar,push,True,solved,3,8,0.0004,2,2
+Level-02,astar-matching,push,True,solved,3,8,0.0005,2,2
+Level-03,astar,step,True,solved,184,327,0.0021,10,6
+Level-03,astar-matching,step,True,solved,134,238,0.0026,10,6
+Level-03,astar,push,True,solved,61,140,0.022,12,4
+Level-03,astar-matching,push,True,solved,49,123,0.0185,12,4
+Level-04,astar,step,True,solved,234,439,0.003,12,5
+Level-04,astar-matching,step,True,solved,218,398,0.0031,12,5
+Level-04,astar,push,True,solved,51,151,0.0271,13,5
+Level-04,astar-matching,push,True,solved,46,143,0.0267,13,5
+Level-05,astar,step,True,solved,3349,5165,0.0525,15,5
+Level-05,astar-matching,step,True,solved,2319,3627,0.0445,15,5
+Level-05,astar,push,True,solved,528,1374,0.3649,16,5
+Level-05,astar-matching,push,True,solved,386,1145,0.3729,16,5
+Level-06,astar,step,True,solved,401,579,0.0077,14,5
+Level-06,astar-matching,step,True,solved,361,533,0.0052,14,5
+Level-06,astar,push,True,solved,56,101,0.0211,14,5
+Level-06,astar-matching,push,True,solved,54,101,0.0183,14,5
+Level-07,astar,step,True,solved,77,126,0.0018,9,4
+Level-07,astar-matching,step,True,solved,77,126,0.0018,9,4
+Level-07,astar,push,True,solved,12,51,0.0162,9,4
+Level-07,astar-matching,push,True,solved,12,51,0.0069,9,4
+Level-08,astar,step,True,solved,146,238,0.0031,10,5
+Level-08,astar-matching,step,True,solved,127,206,0.003,10,5
+Level-08,astar,push,True,solved,23,60,0.01,10,5
+Level-08,astar-matching,push,True,solved,19,55,0.012,10,5
+Level-09,astar,step,True,solved,87635,111199,2.0464,26,12
+Level-09,astar-matching,step,True,solved,53311,74447,1.1205,26,12
+Level-09,astar,push,False,timeout,2710,5277,3.1535,0,0
+Level-09,astar-matching,push,False,timeout,2864,5516,3.2728,0,0
+Level-10,astar,step,False,timeout,92402,156489,3.0006,0,0
+Level-10,astar-matching,step,False,timeout,76016,128790,3.0062,0,0
+Level-10,astar,push,False,timeout,1127,7924,3.7487,0,0
+Level-10,astar-matching,push,False,timeout,1328,9210,3.1931,0,0
+Level-11,astar,step,False,timeout,153049,234083,3.0031,0,0
+Level-11,astar-matching,step,False,timeout,125428,196602,3.0053,0,0
+Level-11,astar,push,False,timeout,1782,11340,3.0586,0,0
+Level-11,astar-matching,push,False,timeout,1345,9313,3.2776,0,0
+Level-12,astar,step,False,timeout,131535,202363,3.0641,0,0
+Level-12,astar-matching,step,False,timeout,81392,135176,3.0398,0,0
+Level-12,astar,push,False,timeout,2424,13135,3.0581,0,0
+Level-12,astar-matching,push,False,timeout,1820,11817,3.2951,0,0
+Level-13,astar,step,True,solved,76619,100203,1.2138,28,8
+Level-13,astar-matching,step,True,solved,53913,69525,1.1939,28,8
+Level-13,astar,push,False,timeout,2971,8842,3.203,0,0
+Level-13,astar-matching,push,False,timeout,2434,6629,3.2759,0,0
+Level-14,astar,step,True,solved,2,2,0.0001,1,1
+Level-14,astar-matching,step,True,solved,2,2,0.0001,1,1
+Level-14,astar,push,True,solved,2,2,0.0001,1,1
+Level-14,astar-matching,push,True,solved,2,2,0.0001,1,1
+Level-15,astar,step,False,no solution,5,5,0.0001,0,0
+Level-15,astar-matching,step,False,no solution,5,5,0.0001,0,0
+Level-15,astar,push,False,no solution,1,1,0.0001,0,0
+Level-15,astar-matching,push,False,no solution,1,1,0.0001,0,0
+Level-16,astar,step,False,no solution,70,70,0.0013,0,0
+Level-16,astar-matching,step,False,no solution,70,70,0.0023,0,0
+Level-16,astar,push,False,no solution,5,5,0.0013,0,0
+Level-16,astar-matching,push,False,no solution,5,5,0.0008,0,0
