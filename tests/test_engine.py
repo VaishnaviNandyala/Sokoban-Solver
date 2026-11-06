@@ -61,7 +61,7 @@ def test_state_hashable_and_equal():
 
 # ---------------- moves ----------------
 def test_plain_move_and_wall_block():
-    level = lv("Level-1.txt")
+    level = lv("Level-01.txt")
     s = level.start                      # player (1,2), box (2,2)
     assert apply_action(level, s, "U") is None       # wall above
     s2 = apply_action(level, s, "L")
@@ -69,14 +69,14 @@ def test_plain_move_and_wall_block():
 
 
 def test_push_box():
-    level = lv("Level-1.txt")
+    level = lv("Level-01.txt")
     s = apply_action(level, level.start, "D")
     assert s.player == (2, 2)
     assert s.boxes == frozenset({(3, 2)})
 
 
 def test_push_into_wall_illegal():
-    level = lv("Level-1.txt")
+    level = lv("Level-01.txt")
     s = apply_action(level, level.start, "D")   # box now on goal (3,2)
     assert apply_action(level, s, "D") is None  # box would hit wall at (4,2)
 
@@ -87,13 +87,13 @@ def test_push_box_into_box_illegal():
 
 
 def test_goal_test():
-    level = lv("Level-1.txt")
+    level = lv("Level-01.txt")
     assert not is_goal(level, level.start)
     assert is_goal(level, apply_action(level, level.start, "D"))
 
 
 def test_successor_letters():
-    level = lv("Level-1.txt")
+    level = lv("Level-01.txt")
     acts = {a for a, _, _ in get_successors(level, level.start)}
     assert "D" in acts       # uppercase = push
     assert "l" in acts and "r" in acts   # lowercase = plain step
@@ -108,7 +108,7 @@ def test_render_roundtrip():
 
 # ---------------- push successors ----------------
 def test_push_successors_replayable():
-    level = lv("Level-4.txt")
+    level = lv("Level-04.txt")
     for action, new, cost in get_push_successors(level, level.start):
         s = level.start
         for a in action:
@@ -118,7 +118,7 @@ def test_push_successors_replayable():
 
 
 def test_canonical_same_region():
-    level = lv("Level-1.txt")
+    level = lv("Level-01.txt")
     a = level.start
     b = apply_action(level, a, "L")
     assert canonical(level, a) == canonical(level, b)
@@ -139,8 +139,8 @@ def bfs(level, limit=300000):
     return None
 
 
-@pytest.mark.parametrize("name", ["Level-14.txt", "Level-1.txt",
-                                  "Level-4.txt", "Level-5.txt"])
+@pytest.mark.parametrize("name", ["Level-14.txt", "Level-01.txt",
+                                  "Level-04.txt", "Level-05.txt"])
 def test_solvable_levels_are_solvable(name):
     level = lv(name)
     path = bfs(level)

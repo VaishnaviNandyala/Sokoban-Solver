@@ -24,8 +24,8 @@ def replay(level, solution):
     return state
 
 
-SOLVABLE = ["Level-14.txt", "Level-1.txt", "Level-2.txt", "Level-3.txt",
-            "Level-6.txt"]
+SOLVABLE = ["Level-14.txt", "Level-01.txt", "Level-2.txt", "Level-03.txt",
+            "Level-06.txt"]
 
 
 @pytest.mark.parametrize("name", SOLVABLE)
@@ -51,7 +51,7 @@ def test_unsolvable_returns_none(name, method, mode):
 
 
 def test_bfs_is_shortest_in_steps():
-    level = lv("Level-1.txt")
+    level = lv("Level-01.txt")
     b, d = bfs(level), dfs(level)
     assert b["length"] <= d["length"]
 
@@ -69,7 +69,7 @@ def test_already_solved_level():
 
 
 def test_state_limit_stops_search():
-    res = bfs(lv("Level-9.txt"), max_states=50)
+    res = bfs(lv("Level-09.txt"), max_states=50)
     assert not res["solved"] and res["reason"] == "state limit"
 
 
@@ -80,6 +80,6 @@ def test_time_limit_stops_search():
 
 def test_bad_arguments():
     with pytest.raises(ValueError):
-        solve(lv("Level-1.txt"), "astar")
+        solve(lv("Level-01.txt"), "astar")
     with pytest.raises(ValueError):
-        solve(lv("Level-1.txt"), "bfs", mode="jump")
+        solve(lv("Level-01.txt"), "bfs", mode="jump")
