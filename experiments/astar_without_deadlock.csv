@@ -1,0 +1,17 @@
+level,method,mode,solved,reason,states_explored,states_generated,time,length,pushes
+Level-01,astar,push,True,solved,2,5,0.0004,1,1
+Level-02,astar,push,True,solved,3,8,0.0008,2,2
+Level-03,astar,push,True,solved,61,140,0.0306,12,4
+Level-04,astar,push,True,solved,51,151,0.0366,13,5
+Level-05,astar,push,True,solved,528,1374,0.4565,16,5
+Level-06,astar,push,True,solved,56,101,0.0206,14,5
+Level-07,astar,push,True,solved,12,51,0.0108,9,4
+Level-08,astar,push,True,solved,23,60,0.0113,10,5
+Level-09,astar,push,True,solved,3941,6088,5.4549,26,12
+Level-10,astar,push,False,timeout,11339,46537,30.267,0,0
+Level-11,astar,push,False,timeout,11569,46252,30.2896,0,0
+Level-12,astar,push,False,timeout,17177,60434,30.2633,0,0
+Level-13,astar,push,True,solved,5068,12358,4.7996,28,8
+Level-14,astar,push,True,solved,2,2,0.0001,1,1
+Level-15,astar,push,False,no solution,1,1,0.0001,0,0
+Level-16,astar,push,False,no solution,5,5,0.0008,0,0
