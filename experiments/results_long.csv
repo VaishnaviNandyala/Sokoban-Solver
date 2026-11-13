@@ -1,0 +1,4 @@
+level,config,status,solved,moves,pushes,nodes_expanded,nodes_generated,time_sec
+Level-10,A* matching (pushes+deadlock),solved,True,29,13,15346,63422,3.8732
+Level-11,A* matching (pushes+deadlock),solved,True,41,17,52732,180149,12.8753
+Level-12,A* matching (pushes+deadlock),solved,True,28,11,35284,143748,12.1309

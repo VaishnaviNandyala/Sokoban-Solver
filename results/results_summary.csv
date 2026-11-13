@@ -1,0 +1,9 @@
+config,levels_solved,unsolvable_detected,timeouts,common_levels_total_nodes,common_levels_total_time_s
+BFS (steps),11,2,3,586589,8.89
+DFS (steps),11,2,3,347049,3.21
+A* sum (steps),11,2,3,168641,4.36
+A* sum (pushes),11,2,3,36707,4.87
+A* sum (pushes+deadlock),11,2,3,15860,4.6
+A* matching (pushes+deadlock),12,2,2,11951,3.55
+WA* w=3 (pushes+deadlock),14,2,0,722,0.19
+Greedy (pushes+deadlock),14,2,0,50,0.01
