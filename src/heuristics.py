@@ -1,69 +1,69 @@
-from typing import Callable, Dict, Tuple
+"""Heuristics for A* (Member 4).
+
+All heuristics here are ADMISSIBLE (never overestimate the remaining number
+of moves) because every box needs at least its Manhattan distance in pushes
+and each push costs at least 1 move. Admissible => A* returns a shortest solution.
+"""
+from functools import lru_cache
 
 from .level_parser import Level
-from .state import Pos, State
-
-Heuristic = Callable[[State], int]
+from .state import State
 
 
-def manhattan(a: Pos, b: Pos) -> int:
+def _manhattan(a, b):
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 
-def simple_heuristic(level: Level) -> Heuristic:
-    """Sum over boxes of the distance to the NEAREST goal.
-
-    Weakness: two boxes may both pick the same goal.
-    """
-    goals = list(level.goals)
-    nearest: Dict[Pos, int] = {}
-
-    def h(state: State) -> int:
-        total = 0
-        for box in state.boxes:
-            if box not in nearest:
-                nearest[box] = min(manhattan(box, g) for g in goals)
-            total += nearest[box]
-        return total
-
-    return h
+def h_zero(level: Level, state: State) -> int:
+    """h = 0. A* then behaves like Dijkstra / uniform-cost search."""
+    return 0
 
 
-def matching_heuristic(level: Level) -> Heuristic:
-    """Give every box its OWN goal so that the total distance is smallest.
+def h_sum_distance(level: Level, state: State) -> int:
+    """Sum over boxes of the Manhattan distance to the NEAREST goal."""
+    goals = tuple(level.goals)
+    return sum(min(_manhattan(b, g) for g in goals) for b in state.boxes)
 
-    Stronger than simple_heuristic (never smaller), so A* explores fewer
-    states. Uses a small dynamic programme over sets of goals, which is fine
-    for the few boxes our levels have.
-    """
-    goals = sorted(level.goals)
-    cache: Dict[Tuple[Pos, ...], int] = {}
 
-    def h(state: State) -> int:
-        boxes = tuple(sorted(state.boxes))
-        if boxes in cache:
-            return cache[boxes]
-        n = len(boxes)
-        inf = float("inf")
-        best = [inf] * (1 << n) 
-        best[0] = 0
-        for mask in range(1 << n):
-            if best[mask] == inf:
-                continue
-            i = bin(mask).count("1")
-            if i >= n:
-                continue
+@lru_cache(maxsize=500000)
+def _matching(goals, boxes):
+    boxes = sorted(boxes)
+    n = len(boxes)
+    cost = [[_manhattan(b, g) for g in goals] for b in boxes]
+    INF = float("inf")
+    dp = {0: 0}
+    for i in range(n):
+        nxt = {}
+        for mask, c in dp.items():
             for j in range(n):
-                if mask >> j & 1:
-                    continue
-                new = mask | (1 << j)
-                cost = best[mask] + manhattan(boxes[i], goals[j])
-                if cost < best[new]:
-                    best[new] = cost
-        cache[boxes] = best[(1 << n) - 1]
-        return cache[boxes]
-
-    return h
+                if not (mask >> j) & 1:
+                    m2 = mask | (1 << j)
+                    v = c + cost[i][j]
+                    if v < nxt.get(m2, INF):
+                        nxt[m2] = v
+        dp = nxt
+    return dp[(1 << n) - 1]
 
 
-HEURISTICS = {"simple": simple_heuristic, "matching": matching_heuristic}
+def h_matching(level: Level, state: State) -> int:
+    """Min-cost one-to-one matching of boxes to goals (Manhattan costs).
+
+    Tighter than h_sum_distance because two boxes may not share one goal.
+    Exact bitmask DP for up to 9 boxes, otherwise falls back to h_sum_distance.
+    """
+    if len(state.boxes) > 9:
+        return h_sum_distance(level, state)
+    return _matching(tuple(sorted(level.goals)), state.boxes)
+
+
+HEURISTICS = {
+    "zero": h_zero,
+    "sum": h_sum_distance,
+    "matching": h_matching,
+}
+
+
+def get_heuristic(name_or_fn):
+    if callable(name_or_fn):
+        return name_or_fn
+    return HEURISTICS[name_or_fn]

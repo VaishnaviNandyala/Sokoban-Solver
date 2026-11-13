@@ -1,0 +1,129 @@
+level,config,status,solved,moves,pushes,nodes_expanded,nodes_generated,time_sec
+Level-1,BFS (steps),solved,True,1,1,1,4,0.0001
+Level-1,DFS (steps),solved,True,1,1,64,65,0.0008
+Level-1,A* sum (steps),solved,True,1,1,1,4,0.0001
+Level-1,A* sum (pushes),solved,True,1,1,1,5,0.0002
+Level-1,A* sum (pushes+deadlock),solved,True,1,1,1,2,0.0002
+Level-1,A* matching (pushes+deadlock),solved,True,1,1,1,2,0.0001
+Level-1,WA* w=3 (pushes+deadlock),solved,True,1,1,1,2,0.0001
+Level-1,Greedy (pushes+deadlock),solved,True,1,1,1,2,0.0001
+Level-2,BFS (steps),solved,True,2,2,12,22,0.0001
+Level-2,DFS (steps),solved,True,2,2,2,9,0.0
+Level-2,A* sum (steps),solved,True,2,2,2,9,0.0001
+Level-2,A* sum (pushes),solved,True,2,2,2,9,0.0002
+Level-2,A* sum (pushes+deadlock),solved,True,2,2,2,5,0.0002
+Level-2,A* matching (pushes+deadlock),solved,True,2,2,2,5,0.0002
+Level-2,WA* w=3 (pushes+deadlock),solved,True,2,2,2,5,0.0002
+Level-2,Greedy (pushes+deadlock),solved,True,2,2,2,5,0.0003
+Level-3,BFS (steps),solved,True,10,6,1078,1522,0.0133
+Level-3,DFS (steps),solved,True,117,22,1501,1597,0.0167
+Level-3,A* sum (steps),solved,True,10,6,183,327,0.0064
+Level-3,A* sum (pushes),solved,True,10,6,43,172,0.0026
+Level-3,A* sum (pushes+deadlock),solved,True,10,6,32,119,0.0071
+Level-3,A* matching (pushes+deadlock),solved,True,10,6,22,89,0.0064
+Level-3,WA* w=3 (pushes+deadlock),solved,True,12,4,4,23,0.0006
+Level-3,Greedy (pushes+deadlock),solved,True,12,4,4,23,0.0006
+Level-4,BFS (steps),solved,True,12,5,1983,2761,0.0225
+Level-4,DFS (steps),solved,True,275,37,4076,4300,0.0418
+Level-4,A* sum (steps),solved,True,12,5,233,439,0.0057
+Level-4,A* sum (pushes),solved,True,12,5,51,279,0.0083
+Level-4,A* sum (pushes+deadlock),solved,True,12,5,24,96,0.0116
+Level-4,A* matching (pushes+deadlock),solved,True,12,5,18,71,0.006
+Level-4,WA* w=3 (pushes+deadlock),solved,True,13,5,5,22,0.0016
+Level-4,Greedy (pushes+deadlock),solved,True,13,5,5,22,0.001
+Level-5,BFS (steps),solved,True,15,5,23639,30035,0.2276
+Level-5,DFS (steps),solved,True,480,73,29451,29795,0.245
+Level-5,A* sum (steps),solved,True,15,5,3348,5167,0.0661
+Level-5,A* sum (pushes),solved,True,15,5,760,3434,0.0875
+Level-5,A* sum (pushes+deadlock),solved,True,15,5,382,1294,0.1049
+Level-5,A* matching (pushes+deadlock),solved,True,15,5,284,1005,0.0982
+Level-5,WA* w=3 (pushes+deadlock),solved,True,16,5,40,173,0.0097
+Level-5,Greedy (pushes+deadlock),solved,True,21,5,5,36,0.0011
+Level-6,BFS (steps),solved,True,14,3,1051,1323,0.0102
+Level-6,DFS (steps),solved,True,72,15,378,423,0.0025
+Level-6,A* sum (steps),solved,True,14,5,400,579,0.0074
+Level-6,A* sum (pushes),solved,True,14,5,73,223,0.0064
+Level-6,A* sum (pushes+deadlock),solved,True,14,5,43,111,0.0049
+Level-6,A* matching (pushes+deadlock),solved,True,14,5,41,107,0.0074
+Level-6,WA* w=3 (pushes+deadlock),solved,True,14,3,10,30,0.0012
+Level-6,Greedy (pushes+deadlock),solved,True,14,3,3,12,0.0004
+Level-7,BFS (steps),solved,True,9,4,378,589,0.0027
+Level-7,DFS (steps),solved,True,12,4,4660,4679,0.0355
+Level-7,A* sum (steps),solved,True,9,4,76,126,0.0013
+Level-7,A* sum (pushes),solved,True,9,4,11,69,0.0017
+Level-7,A* sum (pushes+deadlock),solved,True,9,4,9,45,0.0019
+Level-7,A* matching (pushes+deadlock),solved,True,9,4,9,45,0.0027
+Level-7,WA* w=3 (pushes+deadlock),solved,True,10,4,4,21,0.0015
+Level-7,Greedy (pushes+deadlock),solved,True,10,4,4,21,0.0009
+Level-8,BFS (steps),solved,True,10,5,726,975,0.0048
+Level-8,DFS (steps),solved,True,126,19,2607,2687,0.0186
+Level-8,A* sum (steps),solved,True,10,5,145,238,0.0048
+Level-8,A* sum (pushes),solved,True,10,5,25,95,0.0027
+Level-8,A* sum (pushes+deadlock),solved,True,10,5,23,83,0.003
+Level-8,A* matching (pushes+deadlock),solved,True,10,5,18,70,0.0028
+Level-8,WA* w=3 (pushes+deadlock),solved,True,10,5,8,35,0.0018
+Level-8,Greedy (pushes+deadlock),solved,True,16,5,5,26,0.0012
+Level-9,BFS (steps),solved,True,26,12,207129,214251,1.9582
+Level-9,DFS (steps),solved,True,2145,278,88456,90547,0.763
+Level-9,A* sum (steps),solved,True,26,12,87634,111235,2.0397
+Level-9,A* sum (pushes),solved,True,26,12,18363,49420,2.3871
+Level-9,A* sum (pushes+deadlock),solved,True,26,12,4466,8981,1.1441
+Level-9,A* matching (pushes+deadlock),solved,True,26,12,3436,8658,0.9031
+Level-9,WA* w=3 (pushes+deadlock),solved,True,31,12,13,85,0.003
+Level-9,Greedy (pushes+deadlock),solved,True,32,12,12,87,0.003
+Level-10,BFS (steps),timeout,False,0,0,669952,970637,10.4142
+Level-10,DFS (steps),timeout,False,0,0,946176,954313,10.0021
+Level-10,A* sum (steps),timeout,False,0,0,270592,428503,10.0021
+Level-10,A* sum (pushes),timeout,False,0,0,41728,253902,10.0323
+Level-10,A* sum (pushes+deadlock),timeout,False,0,0,21248,79709,10.081
+Level-10,A* matching (pushes+deadlock),solved,True,29,13,15346,63422,7.5546
+Level-10,WA* w=3 (pushes+deadlock),solved,True,31,13,30,270,0.0334
+Level-10,Greedy (pushes+deadlock),solved,True,56,15,18,169,0.0201
+Level-11,BFS (steps),timeout,False,0,0,643328,886601,10.2067
+Level-11,DFS (steps),timeout,False,0,0,947456,949155,10.0021
+Level-11,A* sum (steps),timeout,False,0,0,312576,459849,10.0006
+Level-11,A* sum (pushes),timeout,False,0,0,43264,264419,10.049
+Level-11,A* sum (pushes+deadlock),timeout,False,0,0,23040,98743,10.0802
+Level-11,A* matching (pushes+deadlock),timeout,False,0,0,22784,98614,10.0201
+Level-11,WA* w=3 (pushes+deadlock),solved,True,45,17,24,224,0.012
+Level-11,Greedy (pushes+deadlock),solved,True,44,17,17,155,0.0176
+Level-12,BFS (steps),timeout,False,0,0,543488,832324,10.0009
+Level-12,DFS (steps),timeout,False,0,0,867072,867587,10.4654
+Level-12,A* sum (steps),timeout,False,0,0,236800,354991,10.0052
+Level-12,A* sum (pushes),timeout,False,0,0,43264,219951,10.0367
+Level-12,A* sum (pushes+deadlock),timeout,False,0,0,17152,74800,10.0657
+Level-12,A* matching (pushes+deadlock),timeout,False,0,0,15872,77304,10.019
+Level-12,WA* w=3 (pushes+deadlock),solved,True,28,11,64,383,0.0479
+Level-12,Greedy (pushes+deadlock),solved,True,39,11,11,89,0.0071
+Level-13,BFS (steps),solved,True,28,8,350591,402555,6.6551
+Level-13,DFS (steps),solved,True,154,48,215853,215985,2.0829
+Level-13,A* sum (steps),solved,True,28,8,76618,100263,2.227
+Level-13,A* sum (pushes),solved,True,28,8,17377,57086,2.377
+Level-13,A* sum (pushes+deadlock),solved,True,28,8,10877,30025,3.3238
+Level-13,A* matching (pushes+deadlock),solved,True,28,8,8119,22971,2.5271
+Level-13,WA* w=3 (pushes+deadlock),solved,True,28,8,634,2030,0.1702
+Level-13,Greedy (pushes+deadlock),solved,True,30,8,8,67,0.0025
+Level-14,BFS (steps),solved,True,1,1,1,2,0.0
+Level-14,DFS (steps),solved,True,1,1,1,2,0.0
+Level-14,A* sum (steps),solved,True,1,1,1,2,0.0002
+Level-14,A* sum (pushes),solved,True,1,1,1,2,0.0
+Level-14,A* sum (pushes+deadlock),solved,True,1,1,1,2,0.0001
+Level-14,A* matching (pushes+deadlock),solved,True,1,1,1,2,0.0001
+Level-14,WA* w=3 (pushes+deadlock),solved,True,1,1,1,2,0.0002
+Level-14,Greedy (pushes+deadlock),solved,True,1,1,1,2,0.0001
+Level-15,BFS (steps),unsolvable,False,0,0,5,5,0.0001
+Level-15,DFS (steps),unsolvable,False,0,0,5,5,0.0002
+Level-15,A* sum (steps),unsolvable,False,0,0,5,5,0.0001
+Level-15,A* sum (pushes),unsolvable,False,0,0,1,1,0.0001
+Level-15,A* sum (pushes+deadlock),unsolvable,False,0,0,0,1,0.0001
+Level-15,A* matching (pushes+deadlock),unsolvable,False,0,0,0,1,0.0
+Level-15,WA* w=3 (pushes+deadlock),unsolvable,False,0,0,0,1,0.0
+Level-15,Greedy (pushes+deadlock),unsolvable,False,0,0,0,1,0.0
+Level-16,BFS (steps),unsolvable,False,0,0,70,70,0.0004
+Level-16,DFS (steps),unsolvable,False,0,0,70,70,0.0005
+Level-16,A* sum (steps),unsolvable,False,0,0,70,70,0.0007
+Level-16,A* sum (pushes),unsolvable,False,0,0,7,7,0.001
+Level-16,A* sum (pushes+deadlock),unsolvable,False,0,0,0,1,0.0001
+Level-16,A* matching (pushes+deadlock),unsolvable,False,0,0,0,1,0.0
+Level-16,WA* w=3 (pushes+deadlock),unsolvable,False,0,0,0,1,0.0
+Level-16,Greedy (pushes+deadlock),unsolvable,False,0,0,0,1,0.0001

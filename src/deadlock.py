@@ -1,145 +1,55 @@
-"""Deadlock detection for Sokoban.
+"""Deadlock detection (Member 4).
 
-Detects boxes that can never reach any goal.
+A state is a deadlock if it can never be solved. Pruning these states makes
+the search much faster. Two kinds are detected:
+
+1. Dead squares (simple deadlock): a box standing on a square from which it can
+   never be pushed to any goal, e.g. a corner that is not a goal, or a wall
+   line with no goal along it. Computed once per level by pulling boxes
+   backwards from the goals.
+2. 2x2 freeze: four neighbouring cells forming a 2x2 block made of walls and
+   boxes, with at least one box not on a goal. Those boxes can never move.
 """
-
 from collections import deque
 from functools import lru_cache
 
 from .level_parser import Level
-from .state import Pos, State
-
-
-DIRECTIONS = [
-    (-1, 0),  # Up
-    (1, 0),   # Down
-    (0, -1),  # Left
-    (0, 1),   # Right
-]
-
-
-def add(pos: Pos, direction: Pos) -> Pos:
-    return (
-        pos[0] + direction[0],
-        pos[1] + direction[1]
-    )
-
-
-def is_corner_deadlock(level: Level, box: Pos) -> bool:
-    """Check whether a box is stuck in a non-goal corner."""
-
-    if box in level.goals:
-        return False
-
-    up = level.is_wall(add(box, (-1, 0)))
-    down = level.is_wall(add(box, (1, 0)))
-    left = level.is_wall(add(box, (0, -1)))
-    right = level.is_wall(add(box, (0, 1)))
-
-    return (up or down) and (left or right)
+from .moves import DIRECTIONS
+from .state import State
 
 
 @lru_cache(maxsize=None)
-def _goal_reachable_positions(level: Level) -> frozenset:
-    """Find box positions from which a goal can be reached.
-
-    Reverse-push search starts at every goal. Other boxes are
-    ignored, making this a safe static dead-square test.
-    """
-
-    reachable = set(level.goals)
-    queue = deque(level.goals)
-
+def dead_squares(level: Level):
+    live = set(level.goals)
+    queue = deque(live)
     while queue:
-        current = queue.popleft()
-
-        for direction in DIRECTIONS:
-            previous = (
-                current[0] - direction[0],
-                current[1] - direction[1]
-            )
-
-            player_stand = (
-                previous[0] - direction[0],
-                previous[1] - direction[1]
-            )
-
-            if level.is_wall(previous):
+        b = queue.popleft()
+        for d in DIRECTIONS.values():
+            p = (b[0] + d[0], b[1] + d[1])      # where the box would come from
+            pl = (p[0] + d[0], p[1] + d[1])     # where the player must stand
+            if p in live or level.is_wall(p) or level.is_wall(pl):
                 continue
-
-            if level.is_wall(player_stand):
-                continue
-
-            if previous not in reachable:
-                reachable.add(previous)
-                queue.append(previous)
-
-    return frozenset(reachable)
+            live.add(p)
+            queue.append(p)
+    floor = {(r, c) for r in range(level.height) for c in range(level.width)
+             if not level.is_wall((r, c))}
+    return frozenset(floor - live)
 
 
-def is_wall_deadlock(level: Level, box: Pos) -> bool:
-    """Check for a box trapped in a non-goal wall dead square."""
-
-    if box in level.goals:
-        return False
-
-    if is_corner_deadlock(level, box):
-        return False
-
-    adjacent_to_wall = any(
-        level.is_wall(add(box, direction))
-        for direction in DIRECTIONS
-    )
-
-    if not adjacent_to_wall:
-        return False
-
-    return box not in _goal_reachable_positions(level)
-
-
-def is_2x2_deadlock(level: Level, state: State) -> bool:
-    """Check whether a 2x2 area is blocked by walls and boxes.
-
-    A blocked 2x2 area is a deadlock if at least one box
-    inside it is not already on a goal.
-    """
-
+def _square_freeze(level: Level, state: State) -> bool:
     boxes = state.boxes
-
-    for box in boxes:
-        r, c = box
-
-        for row in (r - 1, r):
-            for col in (c - 1, c):
-                cells = {
-                    (row, col),
-                    (row + 1, col),
-                    (row, col + 1),
-                    (row + 1, col + 1),
-                }
-
-                blocked = all(
-                    level.is_wall(cell) or cell in boxes
-                    for cell in cells
-                )
-
-                has_unsolved_box = any(
-                    cell in boxes and cell not in level.goals
-                    for cell in cells
-                )
-
-                if blocked and has_unsolved_box:
-                    return True
-
+    for (r, c) in boxes:
+        for dr, dc in ((0, 0), (0, -1), (-1, 0), (-1, -1)):
+            cells = [(r + dr, c + dc), (r + dr, c + dc + 1),
+                     (r + dr + 1, c + dc), (r + dr + 1, c + dc + 1)]
+            if all(level.is_wall(x) or x in boxes for x in cells) and \
+               any(x in boxes and x not in level.goals for x in cells):
+                return True
     return False
 
 
-def is_deadlocked(level: Level, state: State) -> bool:
-    """Return True if any box is in a detected deadlock."""
-
-    reachable = _goal_reachable_positions(level)
-
-    if any(box not in reachable for box in state.boxes):
+def is_deadlock(level: Level, state: State) -> bool:
+    dead = dead_squares(level)
+    if any(b in dead for b in state.boxes):
         return True
-
-    return is_2x2_deadlock(level, state)
+    return _square_freeze(level, state)
