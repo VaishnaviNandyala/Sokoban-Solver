@@ -1,3 +1,4 @@
+
 """Level loading.
 
 File format (standard Sokoban symbols):

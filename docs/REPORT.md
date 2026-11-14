@@ -1,249 +1,561 @@
-# Sokoban Solver: Comparing BFS, DFS and A*
+## Sokoban Solver: Comparing BFS, DFS, A*, Weighted A* and Greedy Search
 
 ## 1. Introduction
 
-Sokoban is a puzzle in which a player pushes boxes onto goal squares. Boxes can only be pushed, never pulled, and a box cannot be pushed into a wall or into another box. A wrong push can make a level impossible to finish, which makes Sokoban a good test for search algorithms.
+Sokoban is a puzzle in which a player pushes boxes around a grid onto designated goal squares. Boxes can only be **pushed, never pulled**, so an incorrect push can place a box in a position from which the puzzle can no longer be completed.
+
+This project develops a Sokoban solver using multiple search strategies and compares their performance on 16 puzzle levels.
+
+The implemented search algorithms are:
+
+- Breadth-First Search (BFS)
+- Depth-First Search (DFS)
+- A\* Search
+- Weighted A\* Search
+- Greedy Best-First Search
+
+The project also improves search using:
+
+- heuristic functions,
+- push-based search,
+- deadlock pruning.
 
-This project builds a Sokoban engine and three solvers (BFS, DFS and A*), adds two improvements to A* (a deadlock check and a stronger heuristic), and measures them on 16 levels. The questions we ask are:
+The main objectives are:
 
-1. How many levels can each algorithm solve in a fixed time?
-2. How many states does each algorithm explore, and how long are its solutions?
-3. How much do the deadlock check and the better heuristic help?
+1. Solve Sokoban levels automatically using different search strategies.
+2. Compare the algorithms in terms of solution length, nodes expanded and execution time.
+3. Study the effect of different heuristics.
+4. Study the effect of push-based search and deadlock pruning.
+5. Compare optimal search with faster, non-optimal approaches.
 
-## 2. Team and contributions
+---
 
-| Member | Part of the project |
-|---|---|
-| Member 1 | Level loader, game engine (state, moves, rendering), `main.py`, engine tests, README start |
-| Member 2 | BFS and DFS solvers, BFS/DFS experiment runner |
-| Member 3 | A* solver and heuristics, A* experiment runner |
-| Member 4 | Deadlock detection and its tests |
-| Member 5 | Levels, results table, charts, report |
+## 2. Team and Contributions
 
-Each member should add or correct their own part of this report. Section 3 belongs to Member 1, Section 4.1 to Member 2, Sections 4.2 and 4.3 to Member 3, Section 4.4 to Member 4, and Sections 5 to 9 to Member 5.
+| Member   | Name                   | Responsibility                                                                                            |
+| -------- | ---------------------- | --------------------------------------------------------------------------------------------------------- |
+| Member 1 | Panuganti Vishishta    | Game rules and setup: `level_parser.py`, `state.py`, `moves.py`, `render.py`, `main.py`, `test_engine.py` |
+| Member 2 | Kollati Devi Chandrika | BFS and DFS: `bfs_dfs.py`, `run_bfs_dfs.py`, `test_bfs_dfs.py`                                            |
+| Member 3 | Nandyala Vaishnavi     | A\* search and heuristics: `astar.py`, `heuristics.py`                                                    |
+| Member 4 | Namburi Veda Aishwarya | Deadlock detection and the demo app: `deadlock.py`, `app.py`, `viz.py`                                    |
+| Member 5 | Chaitrali Zode         | Levels, experiments, results table and charts, report, slides                                             |
 
-## 3. Problem representation (engine)
+Member 3 is responsible for the A* search implementation and heuristic functions. The `astar.py` module contains A*, Weighted A\* and Greedy search, while `heuristics.py` contains the distance and box-goal matching heuristics.
 
-* **State.** A `State` is an immutable pair: the player position and the set of box positions. Because it is hashable, solvers can store it directly in visited sets and dictionaries.
-* **Level.** Walls and goals never change, so they are stored once in the `Level` object, together with the start state and the map size. A cell outside the map counts as a wall.
-* **Level files.** Plain text: `#` wall, `@` player, `+` player on goal, `$` box, `*` box on goal, `.` goal, space for floor. The loader rejects files with no player, more than one player, or a different number of boxes and goals.
-* **Actions.** `U D L R`. A lowercase letter is a plain step and an uppercase letter is a step that pushed a box. A solution is one string such as `dDD`, which can be replayed with `python -m src.main --level <file> --replay <solution>`.
-* **Two search modes.**
-  * *Step mode*: every action is one player step with cost 1.
-  * *Push mode*: every action is one box push, with the walk to the pushing position included. The cost is the number of steps (walk plus push). Push mode has far fewer states. It uses `canonical()` as the visited key: two states with the same boxes and the same region the player can walk in count as the same position.
+---
 
-## 4. Algorithms
+## 3. Project Structure and Level Representation
 
-### 4.1 BFS and DFS
+The project contains 16 text-based Sokoban levels.
 
-Both solvers keep a visited set, so no state is expanded twice.
+The main components are:
 
-* **BFS** uses a FIFO queue and stops when a goal state is generated. Every action costs 1, so in step mode it returns the solution with the fewest moves, and in push mode the solution with the fewest pushes.
-* **DFS** uses a LIFO stack and marks a state as visited when it is taken from the stack. It uses little memory but gives no guarantee about solution length.
+```text
+Sokoban-Solver/
+├── README.md
+├── requirements.txt
+├── app.py
+├── app_play.py
+├── levels/
+├── src/
+│   ├── level_parser.py
+│   ├── state.py
+│   ├── moves.py
+│   ├── render.py
+│   ├── main.py
+│   ├── bfs_dfs.py
+│   ├── astar.py
+│   ├── heuristics.py
+│   ├── deadlock.py
+│   ├── baselines.py
+│   ├── result.py
+│   ├── play.py
+│   ├── runner.py
+│   └── viz.py
+├── experiments/
+│   ├── run_bfs_dfs.py
+│   ├── run_all.py
+│   ├── make_charts.py
+│   ├── results_bfs_dfs.csv
+│   ├── results_all.csv
+│   └── results_long.csv
+├── results/
+│   ├── results_summary.csv
+│   └── charts/
+└── tests/
+```
 
-Both stop with a reason: `solved`, `no solution` (the whole reachable space was searched), `timeout` or `state limit`.
+### Level file format
 
-### 4.2 A*
+| Symbol | Meaning          |
+| ------ | ---------------- |
+| `#`    | Wall             |
+| `@`    | Player           |
+| `+`    | Player on a goal |
+| `$`    | Box              |
+| `*`    | Box on a goal    |
+| `.`    | Goal             |
+| space  | Floor            |
 
-A* keeps a priority queue ordered by f = g + h, where g is the cost so far and h is a heuristic estimate of the remaining cost. Ties are broken by smaller h, then by insertion order. A dictionary stores the cheapest g found for each state, and a worse duplicate taken from the queue is skipped.
+Each level contains exactly one player and the number of boxes is equal to the number of goals.
 
-### 4.3 Heuristics
+---
 
-* **Simple.** The sum, over all boxes, of the Manhattan distance to the *nearest* goal. Its weakness is that two boxes may choose the same goal.
-* **Matching.** Every box gets its *own* goal so that the total Manhattan distance is the smallest. It is computed with a small dynamic programme over sets of goals. It is never smaller than the simple heuristic.
+## 4. Search Algorithms
 
-Both are lower bounds on the number of pushes still needed, and every push costs at least one step, so both are admissible.
+### 4.1 Breadth-First Search
 
-### 4.4 Deadlock detection
+BFS explores states level by level using a queue.
 
-A state is rejected as soon as it is certain to be unsolvable:
+When every action has the same cost, BFS returns the shortest solution.
 
-* **Dead squares.** A reverse search from every goal finds all squares from which a box can still reach some goal (ignoring other boxes). A box on any other square is stuck for ever. This also covers boxes in corners.
-* **2x2 blocks.** If four neighbouring cells in a square are all walls or boxes, and at least one box is not on a goal, the state is dead.
+The main advantage of BFS is optimality, but its memory and search time can increase rapidly as the state space grows.
 
-Rejecting such states early shrinks the search.
+---
 
-## 5. Levels
+### 4.2 Depth-First Search
 
-The project has 16 level files, `Level-01.txt` to `Level-16.txt`. Difficulty rises with the number of boxes: 1 box is *tiny*, 2 or 3 boxes *medium*, and 4 or more boxes *hard*. Levels 15 and 16 have no solution on purpose, so that every solver is tested on the answer "no solution". In Level-15 the box lies in the top row and the player can never stand left of it to push it right. In Level-16 the box lies in the top row and the goal is in a lower row, so the box can never leave the top row.
+DFS follows one branch as deeply as possible before backtracking.
 
-| Level | Size | Boxes | Floor cells | Tier | Fewest pushes | Optimal moves* |
-|---|---|---|---|---|---|---|
-| Level-01 | 5x5 | 1 | 9 | Tiny | 1 | 1 |
-| Level-02 | 5x7 | 1 | 15 | Tiny | 2 | 2 |
-| Level-03 | 6x7 | 2 | 20 | Medium | 4 | 10 |
-| Level-04 | 7x7 | 2 | 25 | Medium | 5 | 12 |
-| Level-05 | 7x7 | 3 | 25 | Medium | 5 | 15 |
-| Level-06 | 5x8 | 2 | 18 | Medium | 3 | 14 |
-| Level-07 | 7x9 | 2 | 33 | Medium | 4 | 9 |
-| Level-08 | 7x7 | 2 | 23 | Medium | 5 | 10 |
-| Level-09 | 8x8 | 3 | 36 | Medium | 12 | 26 |
-| Level-10 | 9x9 | 4 | 49 | Hard | 13 | - |
-| Level-11 | 9x10 | 4 | 51 | Hard | 17 | - |
-| Level-12 | 8x8 | 5 | 36 | Hard | 11 | - |
-| Level-13 | 7x9 | 4 | 31 | Hard | 8 | 28 |
-| Level-14 | 3x5 | 1 | 3 | Tiny | 1 | 1 |
-| Level-15 | 4x5 | 1 | 6 | Unsolvable (test) | - | - |
-| Level-16 | 5x7 | 1 | 15 | Unsolvable (test) | - | - |
+It requires less memory than BFS, but it does not guarantee the shortest solution.
 
-\* Optimal moves are from BFS in step mode and are empty where BFS did not finish in time.
+Therefore, DFS can find very long solutions even when a much shorter solution exists.
 
-**Level checking.** When a solver times out we cannot tell "the level is impossible" from "the solver is too slow". We therefore checked every level with an independent exhaustive search over box pushes that shares no code with the solvers, and replayed one solution per level with the project engine. Result: all 14 non-test levels are solvable, and Levels 15 and 16 are not. Levels 11 and 12 are solvable (17 and 11 pushes) even though no solver finished them in the time limit.
+---
 
-## 6. Experimental setup
+### 4.3 A\* Search
 
-Raw results are in `experiments/results/`:
+A\* selects the state with the lowest:
 
-| File | Content | Time limit (read from the data) |
-|---|---|---|
-| `results_bfs_dfs.csv` | BFS and DFS, step and push mode | about 3 s |
-| `my_astar_test.csv` | A* with simple and matching heuristic, step and push mode | about 3 s |
-| `astar_without_deadlock.csv` | A*, push mode | 30 s |
-| `astar_with_deadlock.csv` | A* with deadlock check, push mode | 30 s |
+\[
+f(n)=g(n)+h(n)
+\]
 
-The limits are read from the data: every timed-out run in the first two files stopped at 3.0 to 3.7 s, and in the last two at about 30 s.
+where:
 
-How we compare fairly:
+- \(g(n)\) is the cost already spent reaching the state.
+- \(h(n)\) is the estimated remaining cost.
+- \(f(n)\) is the total estimated cost of the solution through that state.
 
-* "Solved or not" is only compared **inside one experiment**, because the time limits differ.
-* "States explored" of a **solved** level does not depend on the time limit, so it can be compared across files.
-* Step mode and push mode count different things as a "state", so states are compared inside a mode.
-* Moves and pushes of an unsolved level are left empty (the raw files store 0, which would pull averages down).
-* Times were measured on one machine and change from run to run. State counts are exact. We re-ran all quick levels and got identical state counts to the CSV files (110 of 110 rows).
+A\* therefore combines the actual cost already incurred with an estimate of the remaining cost.
 
-The cleaned tables are in `experiments/results/results_table.xlsx` and the charts in `experiments/results/charts/`.
+With an admissible heuristic, A\* can find a shortest solution.
 
-## 7. Results
+---
 
-### 7.1 Levels solved
+### 4.4 Weighted A\*
 
-![Levels solved](../experiments/results/charts/01_levels_solved.png)
+Weighted A* modifies the A* evaluation function to:
 
-Of the 14 solvable levels, BFS and DFS solve 11 in both modes in about 3 s, and A* solves 11 in step mode but only 9 in push mode. The unsolved ones are Levels 10, 11 and 12 for every method, plus Levels 09 and 13 for A* in push mode (they need about 5 s). With 30 s, A* in push mode solves 11 levels without the deadlock check and **12 with it**. Level 10 (21.2 s) is solved only with the deadlock check. Levels 11 and 12 stay unsolved by all methods.
+\[
+f(n)=g(n)+3h(n)
+\]
 
-### 7.2 States explored and solution length
+in the experiments.
 
-Step mode (levels solved by all three methods, Levels 01, 02 and 14 left out because they are trivial):
+The heuristic is therefore given more importance than in normal A\*.
 
-| Level | BFS states | BFS moves | DFS states | DFS moves | A* states | A* moves |
-|---|---|---|---|---|---|---|
-| Level-03 | 702 | 10 | 1,959 | 282 | 184 | 10 |
-| Level-04 | 1,363 | 12 | 5,441 | 391 | 234 | 12 |
-| Level-05 | 17,925 | 15 | 42,985 | 1,334 | 3,349 | 15 |
-| Level-06 | 792 | 14 | 931 | 216 | 401 | 14 |
-| Level-07 | 229 | 9 | 9,218 | 12 | 77 | 9 |
-| Level-08 | 547 | 10 | 50 | 43 | 146 | 10 |
-| Level-09 | 198,120 | 26 | 157,359 | 3,192 | 87,635 | 26 |
-| Level-13 | 297,713 | 28 | 17,984 | 182 | 76,619 | 28 |
+This makes the search more strongly directed toward the goal and can greatly reduce the number of states expanded.
 
-Push mode (A* from the 30 s run):
+The trade-off is that Weighted A\* does not guarantee the shortest solution.
 
-| Level | BFS states | BFS moves | DFS states | DFS moves | A* states | A* moves |
-|---|---|---|---|---|---|---|
-| Level-03 | 30 | 12 | 100 | 43 | 61 | 12 |
-| Level-04 | 106 | 13 | 218 | 69 | 51 | 13 |
-| Level-05 | 392 | 21 | 1,634 | 349 | 528 | 16 |
-| Level-06 | 9 | 14 | 71 | 54 | 56 | 14 |
-| Level-07 | 62 | 10 | 309 | 35 | 12 | 9 |
-| Level-08 | 67 | 16 | 184 | 84 | 23 | 10 |
-| Level-09 | 6,409 | 32 | 2,046 | 156 | 3,941 | 26 |
-| Level-13 | 8,808 | 30 | 10,467 | 300 | 5,068 | 28 |
+In this project, Weighted A\* uses the `matching` heuristic together with push-based search and deadlock pruning.
 
-![States explored, step mode](../experiments/results/charts/02_states_explored_step_mode.png)
-![States explored, push mode](../experiments/results/charts/02_states_explored_push_mode.png)
+---
 
-* In step mode A* explores fewer states than BFS on every level in the table, and its solutions are as short as BFS (which is optimal in step mode).
-* In push mode A* explores fewer states than BFS on 5 of the 8 levels, but not on Levels 03, 05 and 06.
-* DFS is unpredictable. It is the best on Level 08 (50 states in step mode) but needs 3,192 moves on Level 09, against 26 for BFS and A*.
+### 4.5 Greedy Best-First Search
 
-![Solution length](../experiments/results/charts/03_solution_length.png)
+Greedy search ranks states using only:
 
-BFS in push mode returns the fewest *pushes*, but not the fewest *moves* (for example 21 moves on Level 05, where the optimum is 15), because it ignores the walking.
+\[
+f(n)=h(n)
+\]
 
-### 7.3 Step mode versus push mode
+It ignores the cost already spent, \(g(n)\).
 
-![BFS step vs push](../experiments/results/charts/06_step_vs_push_bfs.png)
+This makes it very fast because it focuses directly on states that appear closest to the goal.
 
-Push mode explores far fewer states. For BFS on Level 09 the number drops from 198,120 to 6,409 (31 times fewer), and on Level 13 from 297,713 to 8,808.
+However, it provides no shortest-path guarantee and can produce substantially longer solutions.
 
-### 7.4 Effect of the deadlock check
+---
 
-A*, push mode, 30 s limit:
+## 5. Heuristics
 
-| Level | States (no check) | States (check) | Saved | Time s (no check) | Time s (check) | Moves |
-|---|---|---|---|---|---|---|
-| Level-03 | 61 | 42 | 31.1% | 0.03 | 0.03 | 12 |
-| Level-04 | 51 | 24 | 52.9% | 0.04 | 0.02 | 13 |
-| Level-05 | 528 | 219 | 58.5% | 0.46 | 0.24 | 16 |
-| Level-06 | 56 | 32 | 42.9% | 0.02 | 0.02 | 14 |
-| Level-07 | 12 | 10 | 16.7% | 0.01 | 0.01 | 9 |
-| Level-08 | 23 | 21 | 8.7% | 0.01 | 0.01 | 10 |
-| Level-09 | 3,941 | 867 | 78.0% | 5.45 | 1.39 | 26 |
-| Level-10 | not solved in 30 s | 7,355 | - | >30 | 21.23 | 31 |
-| Level-11 | not solved in 30 s | not solved in 30 s | - | >30 | >30 | - |
-| Level-12 | not solved in 30 s | not solved in 30 s | - | >30 | >30 | - |
-| Level-13 | 5,068 | 3,288 | 35.1% | 4.80 | 4.31 | 28 |
+The project uses two main heuristics.
 
-![Deadlock effect](../experiments/results/charts/04_deadlock_effect.png)
+### 5.1 Sum of Distances
 
-Over the 11 levels solved both ways, the deadlock check reduces the states explored from 9,747 to 4,510, a saving of **53.7%**, and up to 78% on Level 09. The solutions are the same length. The check also makes Level 10 solvable within 30 s. Each state costs more with the check (for example 2.9 ms per state on Level 10), so the saving in time is smaller than the saving in states on Level 13.
+For every box, the Manhattan distance to its nearest goal is calculated and the distances are added:
 
-### 7.5 Effect of the matching heuristic
+\[
+h(n)=\sum_i \min_j d(box_i,goal_j)
+\]
 
-A*, step mode:
+This heuristic is simple and inexpensive.
 
-| Level | simple (states) | matching (states) | Saved |
-|---|---|---|---|
-| Level-03 | 184 | 134 | 27.2% |
-| Level-04 | 234 | 218 | 6.8% |
-| Level-05 | 3,349 | 2,319 | 30.8% |
-| Level-06 | 401 | 361 | 10.0% |
-| Level-07 | 77 | 77 | 0.0% |
-| Level-08 | 146 | 127 | 13.0% |
-| Level-09 | 87,635 | 53,311 | 39.2% |
-| Level-13 | 76,619 | 53,913 | 29.6% |
+Its weakness is that multiple boxes may effectively choose the same goal when calculating the estimate.
 
-![Heuristics](../experiments/results/charts/05_heuristics.png)
+---
 
-Over the 11 levels solved by both heuristics (including the trivial levels, where there is no difference), matching explores **34.5%** fewer states in step mode, and up to 39% fewer on Level 09. In push mode the saving is 22.4% over the 9 levels solved by both. It never explores more states than the simple heuristic in our data, and the solutions have the same length.
+### 5.2 Box-Goal Matching
 
-### 7.6 Time
+The matching heuristic assigns every box to a distinct goal.
 
-Push mode, seconds (from the 30 s runs for A*):
+It calculates the minimum total Manhattan distance for a one-to-one assignment between boxes and goals.
 
-| Level | BFS | DFS | A* | A* + deadlock |
-|---|---|---|---|---|
-| Level-05 | 0.13 | 0.39 | 0.46 | 0.24 |
-| Level-09 | 2.59 | 0.73 | 5.45 | 1.39 |
-| Level-13 | 2.31 | 1.85 | 4.80 | 4.31 |
+This gives a tighter estimate because two boxes cannot be assigned to the same goal.
 
-A* explores fewer states but each state costs about 2.5 to 3.6 times more time than a BFS state (heuristic and priority queue). Because of this BFS was faster than plain A* on Levels 09 and 13 in push mode. The deadlock check brings A* on Level 09 from 5.45 s to 1.39 s.
+Both heuristics never overestimate the required number of pushes, so they are admissible for the A\* formulation used in the project.
 
-## 8. Discussion
+---
 
-* **State model matters most.** Push mode gave the largest saving (about 30 times fewer states for BFS on Levels 09 and 13).
-* **Pruning is the next biggest gain.** The deadlock check cut more than half of the states and solved one more level.
-* **A better heuristic helps, but less.** The matching heuristic saved about a third of the states in step mode.
-* **Fewer states is not always less time.** A* spends more time on each state. Cheap pruning pays off; an expensive heuristic needs to save a lot of states.
-* **Push-mode A* is not strictly optimal.** It was 1 to 2 moves longer than the step-mode optimum on Levels 03, 04 and 05 (12 against 10, 13 against 12, 16 against 15). We tested the reason: when the visited key is the exact pair (player, boxes) instead of the player *region*, push-mode A* matches the step-mode optimum on Levels 03 to 08. Merging states by region keeps only the first, cheapest arrival, but a different player position inside the region could have made the following walks shorter.
-* **Hard levels need more.** Levels 11 and 12 are solvable but no solver finished them in 30 s.
+## 6. Deadlock Detection
 
-## 9. Limitations and future work
+Deadlock detection is used to prevent the search from wasting time on states that cannot lead to a solution.
 
-* Time limits differ between the experiments (about 3 s and 30 s), so some comparisons are only possible on solved levels.
-* The deadlock check and the matching heuristic were not run together, so their combined effect is unknown.
-* Only one run per setting was recorded, so times have no averages or error bars.
-* The planned graphical replay window (Pygame) is not part of this version. Solutions are replayed in text with `python -m src.main --replay`.
-* Next steps: combine the deadlock check with the matching heuristic, add stronger deadlock rules (for example frozen boxes along walls), use an exact (player, boxes) key or a better cost model in push mode, and aim at Levels 11 and 12.
+A state can be discarded when:
 
-## 10. Conclusion
+- a box is placed on a dead square,
+- a box is trapped in a corner that is not a goal,
+- a box is trapped along a wall with no possible goal,
+- boxes and walls create an unsolvable 2×2 block.
 
-All three algorithms solve the small and medium levels. Push mode, deadlock detection and a stronger heuristic each reduce the work of the search without changing the quality of the solution. The best result was A* with the deadlock check, which solved 12 of the 14 solvable levels in 30 s. The remaining two (Levels 11 and 12) are solvable, as an independent search proved, so they are a clear target for future work.
+Deadlock pruning is an optimization applied to the search. It is separate from the heuristic calculation.
 
-## Appendix: how to reproduce
+---
+
+## 7. Search Configurations
+
+The experiments compare eight configurations:
+
+| Configuration                    | Description                                                         |
+| -------------------------------- | ------------------------------------------------------------------- |
+| BFS                              | One search step = one player step                                   |
+| DFS                              | One search step = one player step                                   |
+| A\* sum (steps)                  | A\* with sum heuristic, one step per player step                    |
+| A\* sum (pushes)                 | One search step = one box push; walking is included in the cost     |
+| A\* sum (pushes + deadlock)      | Push-based A\* with sum heuristic and deadlock pruning              |
+| A\* matching (pushes + deadlock) | Push-based A\* with matching heuristic and deadlock pruning         |
+| WA\* w=3 (pushes + deadlock)     | Weighted A\* with weight 3, matching heuristic and deadlock pruning |
+| Greedy (pushes + deadlock)       | Greedy search with matching heuristic and deadlock pruning          |
+
+---
+
+## 8. Experimental Setup
+
+All experiments use:
+
+- 16 levels
+- 8 algorithm configurations
+- 10-second time limit per configuration
+- one run per configuration
+
+The raw results are stored in:
+
+```text
+experiments/results_all.csv
+```
+
+The summary and charts are generated from this data.
+
+The experiment measures:
+
+- solved status,
+- solution length,
+- nodes expanded,
+- execution time.
+
+The results use the same time limit and node-counting approach for the configurations being compared.
+
+---
+
+## 9. Results
+
+### 9.1 Nodes Expanded
+
+| Level    |             BFS |             DFS | A\* sum (steps) | A\* sum (pushes) | A\* sum + deadlock | A\* matching + deadlock |       WA\* w=3 |         Greedy |
+| -------- | --------------: | --------------: | --------------: | ---------------: | -----------------: | ----------------------: | -------------: | -------------: |
+| Level-1  |               1 |              64 |               1 |                1 |                  1 |                       1 |              1 |              1 |
+| Level-2  |              12 |               2 |               2 |                2 |                  2 |                       2 |              2 |              2 |
+| Level-3  |           1,078 |           1,501 |             183 |               43 |                 32 |                      22 |              4 |              4 |
+| Level-4  |           1,983 |           4,076 |             233 |               51 |                 24 |                      18 |              5 |              5 |
+| Level-5  |          23,639 |          29,451 |           3,348 |              760 |                382 |                     284 |             40 |              5 |
+| Level-6  |           1,051 |             378 |             400 |               73 |                 43 |                      41 |             10 |              3 |
+| Level-7  |             378 |           4,660 |              76 |               11 |                  9 |                       9 |              4 |              4 |
+| Level-8  |             726 |           2,607 |             145 |               25 |                 23 |                      18 |              8 |              5 |
+| Level-9  |         207,129 |          88,456 |          87,634 |           18,363 |              4,466 |                   3,436 |             13 |             12 |
+| Level-10 |         timeout |         timeout |         timeout |          timeout |            timeout |                  15,346 |             30 |             18 |
+| Level-11 |         timeout |         timeout |         timeout |          timeout |            timeout |                 timeout |             24 |             17 |
+| Level-12 |         timeout |         timeout |         timeout |          timeout |            timeout |                 timeout |             64 |             11 |
+| Level-13 |         350,591 |         215,853 |          76,618 |           17,377 |             10,877 |                   8,119 |            634 |              8 |
+| Level-14 |               1 |               1 |               1 |                1 |                  1 |                       1 |              1 |              1 |
+| Level-15 |  unsolvable (5) |  unsolvable (5) |  unsolvable (5) |   unsolvable (1) |     unsolvable (0) |          unsolvable (0) | unsolvable (0) | unsolvable (0) |
+| Level-16 | unsolvable (70) | unsolvable (70) | unsolvable (70) |   unsolvable (7) |     unsolvable (0) |          unsolvable (0) | unsolvable (0) | unsolvable (0) |
+
+---
+
+### 9.2 Solution Length
+
+| Level    |   Shortest |     DFS | WA\* w=3 | Greedy | Pushes (shortest) |
+| -------- | ---------: | ------: | -------: | -----: | ----------------: |
+| Level-1  |          1 |       1 |        1 |      1 |                 1 |
+| Level-2  |          2 |       2 |        2 |      2 |                 2 |
+| Level-3  |         10 |     117 |       12 |     12 |                 6 |
+| Level-4  |         12 |     275 |       13 |     13 |                 5 |
+| Level-5  |         15 |     480 |       16 |     21 |                 5 |
+| Level-6  |         14 |      72 |       14 |     14 |                 5 |
+| Level-7  |          9 |      12 |       10 |     10 |                 4 |
+| Level-8  |         10 |     126 |       10 |     16 |                 5 |
+| Level-9  |         26 |    2145 |       31 |     32 |                12 |
+| Level-10 |         29 | timeout |       31 |     56 |                13 |
+| Level-11 |        41† | timeout |       45 |     44 |                17 |
+| Level-12 |        28† | timeout |       28 |     39 |                11 |
+| Level-13 |         28 |     154 |       28 |     30 |                 8 |
+| Level-14 |          1 |       1 |        1 |      1 |                 1 |
+| Level-15 | unsolvable |       - |        - |      - |                 - |
+| Level-16 | unsolvable |       - |        - |      - |                 - |
+
+† Exact A\* with the matching heuristic requires a longer time limit for Levels 11 and 12. A separate 80-second experiment found 41 moves for Level-11 in about 12.9 seconds and 28 moves for Level-12 in about 12.1 seconds.
+
+---
+
+## 10. Summary of Results
+
+| Configuration                    | Levels solved | Total nodes expanded | Total time (s) |
+| -------------------------------- | ------------: | -------------------: | -------------: |
+| BFS                              |      11 of 14 |              586,589 |           7.36 |
+| DFS                              |      11 of 14 |              347,049 |           3.67 |
+| A\* sum (steps)                  |      11 of 14 |              168,641 |           3.74 |
+| A\* sum (pushes)                 |      11 of 14 |               36,707 |           4.48 |
+| A\* sum (pushes + deadlock)      |      11 of 14 |               15,860 |           5.05 |
+| A\* matching (pushes + deadlock) |      12 of 14 |               11,951 |           6.79 |
+| WA\* w=3 (pushes + deadlock)     |      14 of 14 |                  722 |           0.11 |
+| Greedy (pushes + deadlock)       |      14 of 14 |                   50 |           0.01 |
+
+The 14 solvable levels are Levels 1–14. Levels 15 and 16 are intentionally unsolvable test levels.
+
+---
+
+## 11. Findings
+
+### 11.1 A\* expands far fewer nodes than BFS
+
+Over the common levels, BFS expanded 586,589 nodes, while exact A\* using matching, push-based search and deadlock pruning expanded 11,951 nodes.
+
+This is approximately:
+
+\[
+\frac{586589}{11951}\approx49
+\]
+
+Therefore, the improved A\* configuration expanded about **49 times fewer nodes** than BFS.
+
+---
+
+### 11.2 Each optimization reduces the search effort
+
+The total number of nodes decreases progressively:
+
+```text
+BFS                         586,589
+A* steps                    168,641
+A* pushes                    36,707
+A* pushes + deadlock         15,860
+A* matching + deadlock       11,951
+```
+
+This shows the benefit of combining a better state representation, pruning and a stronger heuristic.
+
+---
+
+### 11.3 BFS and exact A\* produce shortest solutions
+
+BFS and the exact A\* configurations return shortest solutions for the levels they solve.
+
+DFS does not guarantee shortest solutions.
+
+For example:
+
+- Level-9 shortest solution: 26 moves
+- DFS solution: 2,145 moves
+
+Similarly:
+
+- Level-5 shortest solution: 15 moves
+- DFS solution: 480 moves
+
+---
+
+### 11.4 Weighted A\* and Greedy are much faster
+
+Weighted A\* and Greedy solve all 14 solvable levels within the 10-second limit.
+
+Their node counts are also dramatically smaller:
+
+- Weighted A\*: 722 total nodes
+- Greedy: 50 total nodes
+
+However, this speed comes at the cost of optimality.
+
+---
+
+### 11.5 The cost of faster search is longer solutions
+
+Across the 14 solvable levels:
+
+- Shortest solutions total **226 moves**
+- Weighted A\* totals **242 moves**
+- Greedy totals **291 moves**
+
+Therefore:
+
+- Weighted A\* is about **7% longer** than the shortest total.
+- Greedy is about **29% longer** than the shortest total.
+
+This demonstrates the trade-off between speed and optimality.
+
+---
+
+### 11.6 Matching is a stronger heuristic
+
+The matching heuristic gives a tighter estimate because each box is assigned to a different goal.
+
+Within the experiment, exact A* with matching solves one more level than exact A* with the simple heuristic under the 10-second limit.
+
+Level-10 is solved by A* matching within the limit, while the simpler A* configurations time out.
+
+---
+
+### 11.7 Deadlock pruning detects unsolvable levels early
+
+Levels 15 and 16 are intentionally unsolvable.
+
+Without deadlock pruning, the search expands some states before determining that no solution exists.
+
+With deadlock pruning:
+
+```text
+Level-15 → 0 nodes
+Level-16 → 0 nodes
+```
+
+The deadlock-aware configurations therefore identify these impossible levels immediately.
+
+---
+
+### 11.8 Fewer nodes does not always mean less time
+
+A\* can expand fewer nodes but still take more time because each state requires additional computation for:
+
+- heuristic evaluation,
+- priority queue operations,
+- push-based state processing,
+- deadlock checks.
+
+Therefore, node count and execution time are related but are not identical measures of performance.
+
+---
+
+## 12. Limitations
+
+The main limitations of the experiments are:
+
+1. Each configuration was run once, so execution times can vary between runs.
+2. The experiments use a fixed 10-second limit.
+3. Weighted A\* and Greedy sacrifice optimality for speed.
+4. The results are based on 16 levels, so larger level collections could produce different performance patterns.
+5. The implementation uses relatively simple Manhattan-distance-based heuristics.
+6. More advanced deadlock patterns could further reduce search effort.
+
+For more reliable timing comparisons, the experiments can be repeated several times and median execution times can be reported.
+
+---
+
+## 13. Future Work
+
+Possible improvements include:
+
+- adding more advanced deadlock patterns,
+- using pattern databases,
+- benchmarking on larger level collections,
+- repeating experiments to obtain more stable timing measurements,
+- adding a custom level editor,
+- supporting level export/import,
+- improving accessibility and mobile controls.
+
+---
+
+## 14. Conclusion
+
+This project demonstrates how different search strategies behave on the Sokoban problem.
+
+BFS provides shortest solutions but can require a large amount of memory and search effort. DFS uses less memory but can produce very long solutions.
+
+A\* improves the search by combining the actual cost with a heuristic estimate. Push-based search, deadlock pruning and the matching heuristic further reduce the search effort.
+
+Weighted A\* and Greedy search provide a different trade-off. They solve all 14 solvable levels very quickly, but their solutions can be longer than the shortest possible solutions.
+
+Overall, the experiments show that the best search strategy depends on the objective:
+
+- **Shortest solution:** BFS or exact A\*
+- **Reduced search effort:** A\* with push-based search, matching and deadlock pruning
+- **Very fast solution:** Weighted A\* or Greedy
+- **No-solution detection:** deadlock-aware configurations
+
+The project therefore demonstrates the practical trade-off between **optimality, search effort and execution speed** in Sokoban solving.
+
+---
+
+## Appendix: How to Reproduce
+
+Run the following commands from the project root:
 
 ```bash
 python -m pytest -q
-python -m experiments.codes.run_bfs_dfs --time-limit 3 --out experiments/results/results_bfs_dfs.csv
-python -m experiments.codes.run_astar --time-limit 3 --out experiments/results/my_astar_test.csv
+```
+
+Run all experiments:
+
+```bash
+python -m experiments.run_all --time-limit 10
+```
+
+Regenerate charts:
+
+```bash
+python -m experiments.make_charts
+```
+
+Run the Streamlit solver:
+
+```bash
+streamlit run app.py
+```
+
+Run the play-mode application:
+
+```bash
+streamlit run app_play.py
+```
+
+Run the command-line level viewer:
+
+```bash
+python -m src.main --level levels/Level-2.txt
+```
+
+Replay a solution:
+
+```bash
+python -m src.main --level levels/Level-2.txt --replay RR
+```
+
+Example of using A\* directly:
+
+```python
+from src.level_parser import load_level
+from src.astar import astar
+
+res = astar(load_level("levels/Level-9.txt"), "matching")
+print(res.status, res.moves, res.nodes_expanded, res.solution)
 ```
